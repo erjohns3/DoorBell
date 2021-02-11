@@ -52,7 +52,8 @@ button.when_pressed = onPressed
 
 def thread_speaker(text):
     write_to_log('starting text {}'.format(text))
-    subprocess.run(['espeak', '-s', '80', text])
+    # subprocess.run(['espeak', '-s', '80', text])
+    os.system('espeak -s {} {}'.format(str(80), text))
     write_to_log('finished text {}'.format(text))
 
 def speak(text):
