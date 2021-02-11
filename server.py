@@ -40,14 +40,18 @@ def onPressed():
     print("play")
 
 def write_to_log(msg):
-    with open('/home/pi/programming/python/doorbell_getter/server_log.log', 'a') as f:
-        nowstr = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")                   
-        strstr = 'date: {}, msg: {}'.format(nowstr, msg)
-        f.write(strstr + '\n')
-        print(msg)
+    try:
+        with open('/home/pi/programming/python/doorbell_getter/server_log.log', 'a') as f:
+            nowstr = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")                   
+            strstr = 'date: {}, msg: {}'.format(nowstr, msg)
+            f.write(strstr + '\n')
+    except:
+        pass
 
-button = gpiozero.Button(2)
-button.when_pressed = onPressed
+    print(msg)
+
+# button = gpiozero.Button(2)
+# button.when_pressed = onPressed
 
 #################################### text to speech
 
