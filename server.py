@@ -57,10 +57,9 @@ button.when_pressed = onPressed
     # write_to_log('finished text {}'.format(text))
 
 def speak(text):
-    write_to_log('spawning thread for text')
+    write_to_log('spawning process for text: {}'.format(text))
     subprocess.Popen(['espeak', '-s', '80', text])
-    # x = threading.Thread(target=thread_speaker, args=(text,))
-    # x.start()
+    write_to_log('finished spawning process for text: {}'.format(text))
 
 ################################## http server
 
