@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Doorbell</title>
+    <script>
+        console.log("loaded");
+
+
+
+    </script>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            text-align: center;
+            margin: 175px 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <h4>Doorbell Chime</h4>
+    <a>{{ chime }}</a>
+    <form action = "http://localhost:5000" method = "POST">
+        <p><input type = "text" name = "chime" /></p>
+        <p><input type = "submit" value = "Submit" /></p>
+    </form>
+    <br><br><br><br>
+    <h4>Text to Speech</h4>
+    <form action = "http://localhost:5000" method = "POST">
+        <p><input type = "text" name = "speech" /></p>
+        <p><input type = "submit" value = "Submit" /></p>
+    </form>
+</body>
+
+</html>
