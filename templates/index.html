@@ -20,21 +20,21 @@
 <body>
     <h4>Doorbell URL</h4>
     <a>{{ url }}</a>
-    <form action = "http://localhost:5000/url" method = "POST">
+    <form action = "/url" method = "POST">
         <p><input type = "text" name = "url" /></p>
         <p><input type = "submit" value = "Submit" /></p>
     </form>
     <br><br><br>
     <h4></h4>
-    <form action = "http://localhost:5000/play" method = "POST">
+    <form action = "/play" method = "POST">
         <p><input type = "submit" value = "Play" /></p>
     </form>
-    <form action = "http://localhost:5000/stop" method = "POST">
+    <form action = "/stop" method = "POST">
         <p><input type = "submit" value = "Stop" /></p>
     </form>
     <br><br><br>
     <h4>Text to Speech</h4>
-    <form action = "http://localhost:5000/speech" method = "POST">
+    <form action = "/speech" method = "POST">
         <p><input type = "text" name = "speech" /></p>
         <p><input type = "submit" value = "Submit" /></p>
     </form>

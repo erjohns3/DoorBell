@@ -7,6 +7,7 @@ import vlc
 
 
 app = flask.Flask(__name__)
+host = '192.168.86.43'
 
 #################################### audio
 
@@ -59,6 +60,7 @@ def catch_all(path):
     
     global player
     global url
+    global host
 
     if flask.request.method == 'GET':
         return flask.render_template('index.html', url=url)
@@ -77,6 +79,4 @@ def catch_all(path):
 
 
 if __name__ == '__main__':
-    app.run(debug = True, use_reloader=False)
-
-print("done")
+    app.run(host=host, debug = True, use_reloader=False)
