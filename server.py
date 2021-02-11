@@ -37,13 +37,22 @@ setURL("https://www.youtube.com/watch?v=TO7z2FYB_mo")
 def onPressed():
     print("play")
 
+def write_to_log(msg):
+    with open('/home/pi/programming/python/doorbell_getter/server_log.log', 'a') as f:
+        nowstr = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")                   
+        strstr = 'date: {}, msg: {}'.format(nowstr, msg)
+        f.write(strstr)
+    print(msg)
+
 button = gpiozero.Button(2)
 button.when_pressed = onPressed
 
 #################################### text to speech
 
 def thread_speaker(text):
+    write_to_log('starting {}'.format(text))
     subprocess.run(['espeak', '-s', '80', text])
+    write_to_log('finished {}'.format(text))
 
 def speak(text):
     x = threading.Thread(target=thread_speaker, args=(text,))
