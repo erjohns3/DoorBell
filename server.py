@@ -3,10 +3,10 @@ import threading
 import gpiozero
 import pafy
 import vlc
-
+import host_ip
 
 app = flask.Flask(__name__)
-host = '192.168.86.55'
+host = host_ip.ip
 
 #################################### audio
 
