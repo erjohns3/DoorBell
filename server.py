@@ -4,6 +4,7 @@ import subprocess
 import gpiozero
 import pafy
 import vlc
+import datetime
 import host_ip
 
 app = flask.Flask(__name__)
@@ -87,5 +88,7 @@ def catch_all(path):
 
 
 if __name__ == '__main__':
-    write_to_log('spawning thread for text')
+    write_to_log('starting server process')
     app.run(host=host)
+
+write_to_log('ending server process')
