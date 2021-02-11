@@ -87,4 +87,5 @@ def catch_all(path):
 
 
 if __name__ == '__main__':
+    write_to_log('spawning thread for text')
     app.run(host=host)
