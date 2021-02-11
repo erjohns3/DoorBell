@@ -50,11 +50,12 @@ button.when_pressed = onPressed
 #################################### text to speech
 
 def thread_speaker(text):
-    write_to_log('starting {}'.format(text))
+    write_to_log('starting text {}'.format(text))
     subprocess.run(['espeak', '-s', '80', text])
-    write_to_log('finished {}'.format(text))
+    write_to_log('finished text {}'.format(text))
 
 def speak(text):
+    write_to_log('spawning thread for text')
     x = threading.Thread(target=thread_speaker, args=(text,))
     x.start()
 
