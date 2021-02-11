@@ -1,13 +1,12 @@
 import flask
 import threading
 import gpiozero
-import pyttsx3
 import pafy
 import vlc
 
 
 app = flask.Flask(__name__)
-host = '192.168.86.43'
+host = '192.168.86.55'
 
 #################################### audio
 
@@ -37,16 +36,13 @@ setURL("https://www.youtube.com/watch?v=TO7z2FYB_mo")
 def onPressed():
     print("play")
 
-#button = gpiozero.Button(2)
-#button.when_pressed = onPressed
+button = gpiozero.Button(2)
+button.when_pressed = onPressed
 
 #################################### text to speech
 
 def thread_speaker(text):
-    engine = pyttsx3.init()
-    engine.say(text)
-    #engine.setProperty("rate", 1)
-    engine.runAndWait()
+    os.system()
 
 def speak(text):
     x = threading.Thread(target=thread_speaker, args=(text,))
@@ -68,6 +64,7 @@ def catch_all(path):
         
         if path == 'play':
             player.play()
+            print("playing")
         if path == 'stop':
             player.stop()
         if path == 'url' :
@@ -79,4 +76,4 @@ def catch_all(path):
 
 
 if __name__ == '__main__':
-    app.run(host=host, debug = True, use_reloader=False)
+    app.run(host=host)
