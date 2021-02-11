@@ -6,30 +6,35 @@
     <title>Doorbell</title>
     <script>
         console.log("loaded");
-
-
-
     </script>
     <style>
         body {
             background-color: black;
             color: white;
             text-align: center;
-            margin: 175px 0px;
+            margin: 50px 0px;
         }
     </style>
 </head>
 
 <body>
-    <h4>Doorbell Chime</h4>
-    <a>{{ chime }}</a>
-    <form action = "http://localhost:5000" method = "POST">
-        <p><input type = "text" name = "chime" /></p>
+    <h4>Doorbell URL</h4>
+    <a>{{ url }}</a>
+    <form action = "http://localhost:5000/url" method = "POST">
+        <p><input type = "text" name = "url" /></p>
         <p><input type = "submit" value = "Submit" /></p>
     </form>
-    <br><br><br><br>
+    <br><br><br>
+    <h4></h4>
+    <form action = "http://localhost:5000/play" method = "POST">
+        <p><input type = "submit" value = "Play" /></p>
+    </form>
+    <form action = "http://localhost:5000/stop" method = "POST">
+        <p><input type = "submit" value = "Stop" /></p>
+    </form>
+    <br><br><br>
     <h4>Text to Speech</h4>
-    <form action = "http://localhost:5000" method = "POST">
+    <form action = "http://localhost:5000/speech" method = "POST">
         <p><input type = "text" name = "speech" /></p>
         <p><input type = "submit" value = "Submit" /></p>
     </form>
