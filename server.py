@@ -57,8 +57,10 @@ button.when_pressed = onPressed
     # write_to_log('finished text {}'.format(text))
 
 def speak(text):
-    write_to_log('spawning process for text: {}'.format(text))
-    subprocess.Popen(['espeak', '-s', '80', text])
+    arr = ['/bin/sh', '-c', 'espeak', text]
+    write_to_log('spawning process for text, with arguments: {}'.format(','.join(arr)))
+    # subprocess.Popen(['espeak', '-s', '80', text])
+    subprocess.Popen(arr)
     write_to_log('finished spawning process for text: {}'.format(text))
 
 ################################## http server
