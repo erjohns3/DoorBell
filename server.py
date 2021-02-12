@@ -1,13 +1,15 @@
 import flask
 import threading
+import subprocess
 import gpiozero
-import pyttsx3
 import pafy
 import vlc
-
+import datetime
+import host_ip
+import os
 
 app = flask.Flask(__name__)
-host = '192.168.86.55'
+host = host_ip.ip
 
 #################################### audio
 
@@ -37,20 +39,33 @@ setURL("https://www.youtube.com/watch?v=TO7z2FYB_mo")
 def onPressed():
     print("play")
 
-#button = gpiozero.Button(2)
-#button.when_pressed = onPressed
+def write_to_log(msg):
+    try:
+        with open('/home/pi/programming/python/doorbell_getter/server_log.log', 'a') as f:
+            nowstr = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")                   
+            strstr = 'date: {}, msg: {}'.format(nowstr, msg)
+            f.write(strstr + '\n')
+    except:
+        pass
+
+    print(msg)
+
+# button = gpiozero.Button(2)
+# button.when_pressed = onPressed
 
 #################################### text to speech
 
-def thread_speaker(text):
-    engine = pyttsx3.init()
-    engine.say(text)
-    #engine.setProperty("rate", 1)
-    engine.runAndWait()
+# def thread_speaker(text):
+    # write_to_log('starting text {}'.format(text))
+    # os.system('espeak -s {} {}'.format(str(80), text))
+    # write_to_log('finished text {}'.format(text))
 
 def speak(text):
-    x = threading.Thread(target=thread_speaker, args=(text,))
-    x.start()
+    arr = ['espeak', '"{}"'.format(text)]
+    write_to_log('spawning process for text, with arguments: {}'.format(','.join(arr)))
+    # subprocess.Popen(['espeak', '-s', '80', text])
+    subprocess.Popen(arr)
+    write_to_log('finished spawning process for text: {}'.format(text))
 
 ################################## http server
 
@@ -68,6 +83,7 @@ def catch_all(path):
         
         if path == 'play':
             player.play()
+            print("playing")
         if path == 'stop':
             player.stop()
         if path == 'url' :
@@ -79,4 +95,7 @@ def catch_all(path):
 
 
 if __name__ == '__main__':
-    app.run(host=host, debug = True, use_reloader=False)
+    write_to_log('starting server process')
+    app.run(host=host)
+
+write_to_log('ending server process')
