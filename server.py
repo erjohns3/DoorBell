@@ -8,6 +8,7 @@ import time
 import datetime
 import host_ip
 import os
+import validators
 
 app = flask.Flask(__name__)
 host = host_ip.ip
@@ -19,11 +20,15 @@ Instance = vlc.Instance("prefer-insecure")
 player = Instance.media_player_new()
 
 def setURL(val):
+    if not validators.url(val):
+        return False
+
     global url
     global Instance
     global player
 
-    if "youtu" in val :
+
+    if "youtu" in val:
         url = val
         video = pafy.new(url)
         best = video.getbestaudio()
