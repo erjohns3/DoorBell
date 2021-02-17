@@ -65,7 +65,7 @@ class MyHandler(FileSystemEventHandler):
     @staticmethod
     def on_any_event(event):
         global dont_reload_files_containing;
-        if any(lambda x: x in event.src_path, dont_reload_files_containing):
+        if any(map(lambda x: x in event.src_path, dont_reload_files_containing)):
              return
         write_to_log(str(event))
         restart_server()
