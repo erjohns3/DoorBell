@@ -1,9 +1,10 @@
 import flask
 import threading
 import subprocess
-import gpiozero
+import RPi.GPIO as GPIO
 import pafy
 import vlc
+import time
 import datetime
 import host_ip
 import os
@@ -14,7 +15,7 @@ host = host_ip.ip
 #################################### audio
 
 url = "null"
-Instance = vlc.Instance()
+Instance = vlc.Instance("prefer-insecure")
 player = Instance.media_player_new()
 
 def setURL(val):
@@ -22,7 +23,7 @@ def setURL(val):
     global Instance
     global player
 
-    if val[0:30] == "https://www.youtube.com/watch?" :
+    if "youtu" in val :
         url = val
         video = pafy.new(url)
         best = video.getbestaudio()
@@ -32,12 +33,30 @@ def setURL(val):
         player.set_media(Media)
 
 
-setURL("https://www.youtube.com/watch?v=TO7z2FYB_mo")
+setURL("http://www.youtube.com/watch?v=TO7z2FYB_mo")
 
 #################################### gpio signals
 
-def onPressed():
-    print("play")
+def stopChime():
+    global player
+    player.stop()
+    print("stop chime: ", time.time())
+
+def onFall(channel):
+    global chime_timer
+    chime_timer = threading.Timer(8.0, stopChime)
+    chime_timer.start()
+    print("fall")
+
+def onRise(channel):
+    global player
+    global chime_timer
+    print("rise: ", time.time())
+    chime_timer.cancel()
+    chime_timer = threading.Timer(8.0, stopChime)
+    chime_timer.start()
+    player.stop()
+    player.play()
 
 def write_to_log(msg):
     try:
@@ -50,8 +69,13 @@ def write_to_log(msg):
 
     print(msg)
 
-# button = gpiozero.Button(2)
-# button.when_pressed = onPressed
+#button = gpiozero.Button(17)
+chime_timer = threading.Timer(8.0, stopChime)
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(11, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.add_event_detect(11, GPIO.RISING, callback=onRise, bouncetime=200)
+#GPIO.add_event_detect(11, GPIO.FALLING, callback=onFall, bouncetime=200)
 
 #################################### text to speech
 
@@ -61,11 +85,11 @@ def write_to_log(msg):
     # write_to_log('finished text {}'.format(text))
 
 def speak(text):
-    arr = ['espeak', '"{}"'.format(text)]
-    write_to_log('spawning process for text, with arguments: {}'.format(','.join(arr)))
-    # subprocess.Popen(['espeak', '-s', '80', text])
-    subprocess.Popen(arr)
-    write_to_log('finished spawning process for text: {}'.format(text))
+    #arr = ['espeak', '"{}"'.format(text)]
+    #write_to_log('spawning process for text, with arguments: {}'.format(','.join(arr)))
+    subprocess.Popen(['espeak', '-s', '80', text])
+    #subprocess.Popen(arr)
+    #write_to_log('finished spawning process for text: {}'.format(text))
 
 ################################## http server
 
@@ -96,6 +120,6 @@ def catch_all(path):
 
 if __name__ == '__main__':
     write_to_log('starting server process')
-    app.run(host=host)
+    app.run(host=host, debug=False)
 
 write_to_log('ending server process')
