@@ -14,7 +14,7 @@ os.chdir(doorbell_git_path)
 server_file = os.path.join(doorbell_git_path, 'server.py')
 server_call_out_file = os.path.join(the_path, 'server_process_output.txt')
 hupper_out_file = os.path.join(the_path, 'monitor_server_logs.log')
-python_to_run = '/home/pi/programming/python/envs/general/bin/python'
+python_to_run = '/usr/bin/python'
 
 global proc; proc = None
 global ourtime; ourtime = 0
