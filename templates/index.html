@@ -38,10 +38,18 @@
 
         .url {
             padding: 0;
-            margin: 0;
+            margin: 0 5vw;
+            width: 90vw;
             height: 100px;
             line-height: 100px;
             font-size: 40px;
+            color: hsl(0deg 0% 90%);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        a {
             color: hsl(0deg 0% 90%);
         }
 
@@ -100,7 +108,9 @@
 <body>
     <h1 class="title">Door Bell</h1>
     <h2 class="name">Chime</h2>
-    <a class="url">{{ url }}</a>
+    <div class="url">
+        <a href={{url}}>{{url}}</a>
+    </div>
     <form action = "/url" method = "POST">
         <input class="textbox" type = "text" name = "url" placeholder="URL"/>
         <input class="button chime" type = "submit" value = "Set Chime" />
@@ -115,7 +125,7 @@
         <input class="textbox" type="text" name="speech" placeholder="Speech"/>
         <input class="button speak" type="submit" value="Speak" />
     </form>
-    <br>
+    <br><br>
 </body>
 
 </html>
