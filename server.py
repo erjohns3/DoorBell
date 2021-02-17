@@ -13,6 +13,19 @@ import validators
 app = flask.Flask(__name__)
 host = host_ip.ip
 
+#################################### logging
+
+def write_to_log(msg):
+    try:
+        with open('/home/pi/programming/python/doorbell_getter/server_log.log', 'a') as f:
+            nowstr = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")                   
+            strstr = 'date: {}, msg: {}'.format(nowstr, msg)
+            f.write(strstr + '\n')
+    except:
+        pass
+
+    print(msg)
+
 #################################### audio
 
 url = "null"
@@ -63,17 +76,6 @@ def onRise(channel):
     player.stop()
     player.play()
 
-def write_to_log(msg):
-    try:
-        with open('/home/pi/programming/python/doorbell_getter/server_log.log', 'a') as f:
-            nowstr = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")                   
-            strstr = 'date: {}, msg: {}'.format(nowstr, msg)
-            f.write(strstr + '\n')
-    except:
-        pass
-
-    print(msg)
-
 #button = gpiozero.Button(17)
 chime_timer = threading.Timer(8.0, stopChime)
 
@@ -111,6 +113,7 @@ def catch_all(path):
     elif flask.request.method == 'POST':
         
         if path == 'play':
+            player.stop()
             player.play()
             print("playing")
         if path == 'stop':
