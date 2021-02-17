@@ -7,7 +7,7 @@ from watchdog.events import LoggingEventHandler, FileSystemEventHandler
 import subprocess
 import datetime
 
-above_git_the_path = "/home/pi/programming/python/doorbell_getter"
+the_path = "/home/pi/programming/python/doorbell_getter"
 doorbell_git_path = os.path.join(the_path, "DoorBell")
 os.chdir(doorbell_git_path)
 
@@ -18,6 +18,10 @@ python_to_run = '/home/pi/programming/python/envs/general/bin/python'
 
 global proc; proc = None
 global ourtime; ourtime = 0
+global dont_reload_files_containing; dont_reload_files_containing = [
+    '.git',
+    '__pycache__'
+]
 
 def write_to_log(msg):
     with open(hupper_out_file, 'a') as f:
@@ -60,7 +64,8 @@ def restart_server():
 class MyHandler(FileSystemEventHandler):
     @staticmethod
     def on_any_event(event):
-        if '.git' in event.src_path or '__pycache__':
+        global dont_reload_files_containing;
+        if any(lambda x: x in event.src_path, dont_reload_files_containing):
              return
         write_to_log(str(event))
         restart_server()
