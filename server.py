@@ -50,8 +50,14 @@ def setURL(val):
         Media.get_mrl()
         player.set_media(Media)
 
+        f = open("url.txt", "w")
+        f.write(val)
+        f.close()
 
-setURL("http://www.youtube.com/watch?v=TO7z2FYB_mo")
+
+f = open("url.txt", "r")
+setURL(f.read())
+f.close()
 
 #################################### gpio signals
 
