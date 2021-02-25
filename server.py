@@ -50,12 +50,12 @@ def setURL(val):
         Media.get_mrl()
         player.set_media(Media)
 
-        f = open("url.txt", "w")
+        f = open("../url.txt", "w")
         f.write(val)
         f.close()
 
 
-f = open("url.txt", "r")
+f = open("../url.txt", "r")
 setURL(f.read())
 f.close()
 
