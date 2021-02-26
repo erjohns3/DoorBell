@@ -56,7 +56,7 @@ def setURL(val):
 
 
 f = open("../url.txt", "r")
-setURL(f.read())
+setURL(f.readline())
 f.close()
 
 #################################### gpio signals
