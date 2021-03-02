@@ -33,6 +33,19 @@ url = "null"
 Instance = vlc.Instance("prefer-insecure")
 player = Instance.media_player_new()
 
+def stop():
+    global player
+    player.stop()
+    print("stop")
+    print(player)
+
+def play():
+    global player
+    player.stop()
+    player.play()
+    print("play")
+    print(player)
+
 def setURL(val):
     if not validators.url(val):
         return False
@@ -40,7 +53,6 @@ def setURL(val):
     global url
     global Instance
     global player
-
 
     if "youtu" in val:
         url = val
@@ -50,6 +62,8 @@ def setURL(val):
         Media = Instance.media_new(playurl)
         Media.get_mrl()
         player.set_media(Media)
+        print("url set")
+        print(player)
 
         f = open(url_file, "w")
         f.write(val)
@@ -62,29 +76,22 @@ f.close()
 
 #################################### gpio signals
 
-def stopChime():
-    global player
-    player.stop()
-    print("stop chime: ", time.time())
-
 def onFall(channel):
     global chime_timer
-    chime_timer = threading.Timer(8.0, stopChime)
+    chime_timer = threading.Timer(8.0, stop)
     chime_timer.start()
     print("fall")
 
 def onRise(channel):
-    global player
     global chime_timer
     print("rise: ", time.time())
     chime_timer.cancel()
-    chime_timer = threading.Timer(8.0, stopChime)
+    chime_timer = threading.Timer(8.0, stop)
     chime_timer.start()
-    player.stop()
-    player.play()
+    play()
 
 #button = gpiozero.Button(17)
-chime_timer = threading.Timer(8.0, stopChime)
+chime_timer = threading.Timer(8.0, stop)
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(11, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
@@ -102,7 +109,6 @@ def speak(text):
 @app.route('/<path:path>', methods = ['POST', 'GET'])
 def catch_all(path): 
     
-    global player
     global url
     global host
 
@@ -111,11 +117,9 @@ def catch_all(path):
     elif flask.request.method == 'POST':
         
         if path == 'play':
-            player.stop()
-            player.play()
-            print("playing")
+            play()
         if path == 'stop':
-            player.stop()
+            stop()
         if path == 'url' :
             setURL(flask.request.form['url'])
         if path == 'speech':
