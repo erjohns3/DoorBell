@@ -12,6 +12,7 @@ import validators
 
 app = flask.Flask(__name__)
 host = host_ip.ip
+url_file = "/home/pi/programming/python/doorbell_getter/url.txt"
 
 #################################### logging
 
@@ -50,12 +51,12 @@ def setURL(val):
         Media.get_mrl()
         player.set_media(Media)
 
-        f = open("../url.txt", "w")
+        f = open(url_file, "w")
         f.write(val)
         f.close()
 
 
-f = open("../url.txt", "r")
+f = open(url_file, "r")
 setURL(f.readline())
 f.close()
 
@@ -92,17 +93,8 @@ GPIO.add_event_detect(11, GPIO.RISING, callback=onRise, bouncetime=200)
 
 #################################### text to speech
 
-# def thread_speaker(text):
-    # write_to_log('starting text {}'.format(text))
-    # os.system('espeak -s {} {}'.format(str(80), text))
-    # write_to_log('finished text {}'.format(text))
-
 def speak(text):
-    #arr = ['espeak', '"{}"'.format(text)]
-    #write_to_log('spawning process for text, with arguments: {}'.format(','.join(arr)))
     subprocess.Popen(['espeak', '-s', '80', text])
-    #subprocess.Popen(arr)
-    #write_to_log('finished spawning process for text: {}'.format(text))
 
 ################################## http server
 
@@ -133,7 +125,5 @@ def catch_all(path):
 
 
 if __name__ == '__main__':
-    write_to_log('starting server process')
     app.run(host=host, debug=False)
 
-write_to_log('ending server process')
