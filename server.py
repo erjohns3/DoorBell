@@ -9,6 +9,7 @@ import datetime
 import host_ip
 import os
 import validators
+import sys
 
 app = flask.Flask(__name__)
 host = host_ip.ip
@@ -26,6 +27,7 @@ def write_to_log(msg):
         pass
 
     print(msg)
+    sys.stdout.flush()
 
 #################################### audio
 
@@ -38,6 +40,7 @@ def stop():
     player.stop()
     print("stop")
     print(player)
+    sys.stdout.flush()
 
 def play():
     global player
@@ -45,6 +48,7 @@ def play():
     player.play()
     print("play")
     print(player)
+    sys.stdout.flush()
 
 def setURL(val):
     if not validators.url(val):
@@ -64,6 +68,7 @@ def setURL(val):
         player.set_media(Media)
         print("url set")
         print(player)
+        sys.stdout.flush()
 
         f = open(url_file, "w")
         f.write(val)
@@ -81,10 +86,12 @@ def onFall(channel):
     chime_timer = threading.Timer(8.0, stop)
     chime_timer.start()
     print("fall")
+    sys.stdout.flush()
 
 def onRise(channel):
     global chime_timer
     print("rise: ", time.time())
+    sys.stdout.flush()
     chime_timer.cancel()
     chime_timer = threading.Timer(8.0, stop)
     chime_timer.start()
