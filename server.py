@@ -112,6 +112,17 @@ def speak(text):
 
 ################################## http server
 
+def monitor():
+    while True:
+        global player
+        print("{}, {}, {}, {}".format(player, player.will_play(), player.get_state(), player.get_length()))
+        time.sleep(600)
+
+monitor_thread = threading.Thread(target=monitor, args=())
+monitor_thread.start()
+
+####################################
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>', methods = ['POST', 'GET'])
 def catch_all(path): 
