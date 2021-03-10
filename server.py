@@ -94,7 +94,7 @@ def setTime(val):
         start_time = 0
 
     f = open(time_file, "w")
-    f.write(start_time)
+    f.write(str(start_time))
     f.close()
 
 
