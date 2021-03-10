@@ -33,7 +33,7 @@ def write_to_log(msg):
 #################################### audio
 
 url = "null"
-start_time = "0.0"
+start_time = 0.0
 Instance = vlc.Instance("prefer-insecure")
 player = Instance.media_player_new()
 
@@ -49,15 +49,14 @@ def play():
     global start_time
     global url
     player.stop()
-    print("play")
     ret = player.play()
-    print(ret)
+    print("play: " + str(ret))
     if ret != 0 :
         setURL(url)
-    ret = player.play()
-    player.set_time(float(start_time) * 1000)
-    print(ret)
-    print(player)
+        ret = player.play()
+        print("play: " + str(ret))
+    player.set_time(int(start_time*1000))
+    print(player.get_time())
     sys.stdout.flush()
 
 def setURL(val):
@@ -89,14 +88,13 @@ def setTime(val):
     global start_time
 
     try:
-        float(val)
+        start_time = float(val)
         print("time valid: " + val)
     except ValueError:
-        val = "0.0"
+        start_time = 0.0
         print("time invalid: " + val)
 
     sys.stdout.flush()
-    start_time = str(float(val))
     f = open(time_file, "w")
     f.write(str(start_time))
     f.close()
@@ -161,9 +159,7 @@ def catch_all(path):
     global url
     global host
 
-    if flask.request.method == 'GET':
-        return flask.render_template('index.html', url=url)
-    elif flask.request.method == 'POST':
+    if flask.request.method == 'POST':
         
         if path == 'play':
             play()
@@ -175,7 +171,7 @@ def catch_all(path):
         if path == 'speech':
             speak(flask.request.form['speech'])
         
-        return flask.render_template('index.html', url=url)
+    return flask.render_template('index.html', url=url, start_time=start_time)
 
 
 if __name__ == '__main__':
