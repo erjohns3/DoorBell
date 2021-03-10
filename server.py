@@ -14,6 +14,7 @@ import sys
 app = flask.Flask(__name__)
 host = host_ip.ip
 url_file = "/home/pi/programming/python/doorbell_getter/url.txt"
+time_file = "/home/pi/programming/python/doorbell_getter/time.txt"
 
 #################################### logging
 
@@ -32,6 +33,7 @@ def write_to_log(msg):
 #################################### audio
 
 url = "null"
+start_time = 0
 Instance = vlc.Instance("prefer-insecure")
 player = Instance.media_player_new()
 
@@ -44,9 +46,17 @@ def stop():
 
 def play():
     global player
+    global start_time
+    global url
     player.stop()
-    player.play()
     print("play")
+    ret = player.play()
+    print(ret)
+    if ret != 0 :
+        setURL(url)
+    ret = player.play()
+    player.set_time(start_time * 1000)
+    print(ret)
     print(player)
     sys.stdout.flush()
 
@@ -71,12 +81,29 @@ def setURL(val):
         sys.stdout.flush()
 
         f = open(url_file, "w")
-        f.write(val)
+        f.write(url)
         f.close()
+
+def setTime(val):
+
+    global start_time
+
+    try:
+        start_time = float(val)
+    except ValueError:
+        start_time = 0
+
+    f = open(time_file, "w")
+    f.write(start_time)
+    f.close()
 
 
 f = open(url_file, "r")
 setURL(f.readline())
+f.close()
+
+f = open(time_file, "r")
+setTime(f.readline())
 f.close()
 
 #################################### gpio signals
@@ -118,8 +145,8 @@ def monitor():
         print("{}, {}, {}, {}".format(player, player.will_play(), player.get_state(), player.get_length()))
         time.sleep(600)
 
-monitor_thread = threading.Thread(target=monitor, args=())
-monitor_thread.start()
+#monitor_thread = threading.Thread(target=monitor, args=())
+#monitor_thread.start()
 
 ####################################
 
@@ -140,6 +167,7 @@ def catch_all(path):
             stop()
         if path == 'url' :
             setURL(flask.request.form['url'])
+            setTime(flask.request.form['time'])
         if path == 'speech':
             speak(flask.request.form['speech'])
         
