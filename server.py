@@ -34,6 +34,7 @@ def write_to_log(msg):
 
 url = "null"
 start_time = 0.0
+last_reset = 0
 Instance = vlc.Instance("prefer-insecure")
 player = Instance.media_player_new()
 
@@ -49,12 +50,15 @@ def play():
     global start_time
     global url
     player.stop()
-    ret = player.play()
-    print("play: " + str(ret))
-    if ret != 0 :
-        setURL(url)
-        ret = player.play()
-        print("play: " + str(ret))
+    try:
+       player.play()
+       print(player) 
+    except:
+        print("reset player") 
+        resetPlayer()
+        player.play()
+        print(player) 
+    print("play")
     player.set_time(int(start_time*1000))
     print(player.get_time())
     sys.stdout.flush()
@@ -99,6 +103,18 @@ def setTime(val):
     f.write(str(start_time))
     f.close()
 
+def resetPlayer():
+
+    global url
+    global Instance
+    global player
+
+    video = pafy.new(url)
+    best = video.getbestaudio()
+    playurl = best.url
+    Media = Instance.media_new(playurl)
+    Media.get_mrl()
+    player.set_media(Media)
 
 f = open(url_file, "r")
 setURL(f.readline())
@@ -114,7 +130,7 @@ def onFall(channel):
     global chime_timer
     chime_timer = threading.Timer(8.0, stop)
     chime_timer.start()
-    print("fall")
+    print("fall: ", time.time())
     sys.stdout.flush()
 
 def onRise(channel):
