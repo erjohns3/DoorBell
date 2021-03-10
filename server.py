@@ -33,7 +33,7 @@ def write_to_log(msg):
 #################################### audio
 
 url = "null"
-start_time = 0
+start_time = "0.0"
 Instance = vlc.Instance("prefer-insecure")
 player = Instance.media_player_new()
 
@@ -55,7 +55,7 @@ def play():
     if ret != 0 :
         setURL(url)
     ret = player.play()
-    player.set_time(start_time * 1000)
+    player.set_time(float(start_time) * 1000)
     print(ret)
     print(player)
     sys.stdout.flush()
@@ -89,13 +89,14 @@ def setTime(val):
     global start_time
 
     try:
-        start_time = float(val)
-        print("time valid")
+        float(val)
+        print("time valid: " + val)
     except ValueError:
-        start_time = 0
-        print("time invalid")
+        val = "0.0"
+        print("time invalid: " + val)
 
     sys.stdout.flush()
+    start_time = str(float(val))
     f = open(time_file, "w")
     f.write(str(start_time))
     f.close()
