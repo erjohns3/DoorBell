@@ -90,9 +90,12 @@ def setTime(val):
 
     try:
         start_time = float(val)
+        print("time valid")
     except ValueError:
         start_time = 0
+        print("time invalid")
 
+    sys.stdout.flush()
     f = open(time_file, "w")
     f.write(str(start_time))
     f.close()
