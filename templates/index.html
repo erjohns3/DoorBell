@@ -175,6 +175,9 @@
         <input class="button speak" type="submit" value="Speak" />
     </form>
     <h2 class="name">Settings</h2>
+    <div class="time">
+        <a>{{volume}}%</a>
+    </div>
     <form action="/volume" method="POST">
         <input class="speech-textbox" type="number" min="0" max="100" name="volume" placeholder="Volume"/>
         <input class="button speak" type="submit" value="Set Volume" />
