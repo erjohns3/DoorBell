@@ -10,11 +10,13 @@ import host_ip
 import os
 import validators
 import sys
+import alsaaudio
 
 app = flask.Flask(__name__)
 host = host_ip.ip
 url_file = "/home/pi/programming/python/doorbell_getter/url.txt"
-time_file = "/home/pi/programming/python/doorbell_getter/time.txt"
+skip_file = "/home/pi/programming/python/doorbell_getter/skip.txt"
+duration_file = "/home/pi/programming/python/doorbell_getter/duration.txt"
 
 #################################### logging
 
@@ -33,8 +35,10 @@ def write_to_log(msg):
 #################################### audio
 
 url = "null"
-start_time = 0.0
+skip = 0.0
 last_reset = 0
+duration = -1
+duration_timer = threading.Timer(duration, stop)
 Instance = vlc.Instance("prefer-insecure")
 player = Instance.media_player_new()
 
@@ -47,16 +51,21 @@ def stop():
 
 def play():
     global player
-    global start_time
+    global skip
+    global duration
+    global duration_timer
     global url
     player.stop()
     if time.time() - last_reset > 600:
        resetPlayer() 
        print("reset player")        
     player.play()
-    print(player) 
     print("play")
-    player.set_time(int(start_time*1000))
+    player.set_time(int(skip*1000))
+    duration_timer.cancel()
+    if duration > 0:
+        duration_timer = threading.Timer(duration, stop)
+        duration_timer.start()
     print(player.get_time())
     sys.stdout.flush()
 
@@ -77,6 +86,7 @@ def setURL(val):
         return False
 
     global url
+    global url_file
     global Instance
     global player
 
@@ -91,18 +101,34 @@ def setURL(val):
         f.write(url)
         f.close()
 
-def setTime(val):
-    global start_time
+def setSkip(val):
+    global skip
+    global skip_file
     try:
-        start_time = float(val)
-        print("time valid: " + val)
+        skip = float(val)
+        skip = max(0, skip)
+        print("skip valid: " + val)
     except ValueError:
-        start_time = 0.0
-        print("time invalid: " + val)
-
+        skip = 0.0
+        print("skip invalid: " + val)
     sys.stdout.flush()
-    f = open(time_file, "w")
-    f.write(str(start_time))
+    f = open(skip_file, "w")
+    f.write(str(skip))
+    f.close()
+
+def setDuration(val):
+    global duration
+    global duration_file
+    try:
+        duration = float(val)
+        duration = max(0.01, duration)
+        print("duration valid: " + val)
+    except ValueError:
+        duration = -1
+        print("duration invalid: " + val)
+    sys.stdout.flush()
+    f = open(duration_file, "w")
+    f.write(str(duration))
     f.close()
 
 
@@ -110,30 +136,36 @@ f = open(url_file, "r")
 setURL(f.readline())
 f.close()
 
-f = open(time_file, "r")
-setTime(f.readline())
+f = open(skip_file, "r")
+setSkip(f.readline())
 f.close()
+
+f = open(duration_file, "r")
+setDuration(f.readline())
+f.close()
+
+#################################### volume
+
+mixer = alsaaudio.Mixer()
+volume = mixer.getvolume()[0]
+
+def setVolume(val):
+    global volume
+    try:
+        volume = int(val)
+        print("volume valid: " + val)
+    except:
+        print("volume invalid: " + val)
+    volume = min(100, max(0, volume))
+    mixer.setvolume(volume)
+    volume = mixer.getvolume()[0]
 
 #################################### gpio signals
 
-def onFall(channel):
-    global chime_timer
-    chime_timer = threading.Timer(8.0, stop)
-    chime_timer.start()
-    print("fall: ", time.time())
-    sys.stdout.flush()
-
 def onRise(channel):
-    global chime_timer
     print("rise: ", time.time())
     sys.stdout.flush()
-    chime_timer.cancel()
-    chime_timer = threading.Timer(8.0, stop)
-    chime_timer.start()
     play()
-
-#button = gpiozero.Button(17)
-chime_timer = threading.Timer(8.0, stop)
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(11, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
@@ -169,15 +201,18 @@ def catch_all(path):
         
         if path == 'play':
             play()
-        if path == 'stop':
+        elif path == 'stop':
             stop()
-        if path == 'url' :
+        elif path == 'url' :
             setURL(flask.request.form['url'])
-            setTime(flask.request.form['time'])
-        if path == 'speech':
+            setSkip(flask.request.form['skip'])
+            setDuration(flask.request.form['duration'])
+        elif path == 'speech':
             speak(flask.request.form['speech'])
+        elif path == 'volume':
+            setVolume(flask.request.form['volume'])
         
-    return flask.render_template('index.html', url=url, start_time=start_time)
+    return flask.render_template('index.html', url=url, skip=skip, duration=duration, volume=volume)
 
 
 if __name__ == '__main__':
