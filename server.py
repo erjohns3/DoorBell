@@ -74,14 +74,12 @@ def resetPlayer():
     last_reset = time.time()
 
 def setURL(val):
-    if not validators.url(val):
-        return False
-
     global url
     global url_file
     global Instance
     global player
-
+    if not validators.url(val):
+        return False
     if "youtu" in val:
         url = val
         resetPlayer()
@@ -98,11 +96,10 @@ def setSkip(val):
     global skip_file
     try:
         skip = float(val)
-        skip = max(0, skip)
-        print("skip valid: " + val)
     except ValueError:
-        skip = 0.0
-        print("skip invalid: " + val)
+        return
+    skip = max(0, skip)
+    print("skip valid: " + val)
     sys.stdout.flush()
     f = open(skip_file, "w")
     f.write(str(skip))
@@ -113,11 +110,11 @@ def setDuration(val):
     global duration_file
     try:
         duration = float(val)
-        duration = max(0.01, duration)
-        print("duration valid: " + val)
     except ValueError:
-        duration = -1
-        print("duration invalid: " + val)
+        return
+    if duration <= 0:
+        duration_file = -1
+    print("duration valid: " + val)
     sys.stdout.flush()
     f = open(duration_file, "w")
     f.write(str(duration))
