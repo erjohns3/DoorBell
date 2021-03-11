@@ -50,18 +50,27 @@ def play():
     global start_time
     global url
     player.stop()
-    try:
-       player.play()
-       print(player) 
-    except:
-        print("reset player") 
-        resetPlayer()
-        player.play()
-        print(player) 
+    if time.time() - last_reset > 600
+       resetPlayer() 
+       print("reset player")        
+    player.play()
+    print(player) 
     print("play")
     player.set_time(int(start_time*1000))
     print(player.get_time())
     sys.stdout.flush()
+
+def resetPlayer():
+    global url
+    global Instance
+    global player
+    video = pafy.new(url)
+    best = video.getbestaudio()
+    playurl = best.url
+    Media = Instance.media_new(playurl)
+    Media.get_mrl()
+    player.set_media(Media)
+    last_reset = time.time()
 
 def setURL(val):
     if not validators.url(val):
@@ -73,12 +82,7 @@ def setURL(val):
 
     if "youtu" in val:
         url = val
-        video = pafy.new(url)
-        best = video.getbestaudio()
-        playurl = best.url
-        Media = Instance.media_new(playurl)
-        Media.get_mrl()
-        player.set_media(Media)
+        resetPlayer()
         print("url set")
         print(player)
         sys.stdout.flush()
@@ -88,9 +92,7 @@ def setURL(val):
         f.close()
 
 def setTime(val):
-
     global start_time
-
     try:
         start_time = float(val)
         print("time valid: " + val)
@@ -103,18 +105,6 @@ def setTime(val):
     f.write(str(start_time))
     f.close()
 
-def resetPlayer():
-
-    global url
-    global Instance
-    global player
-
-    video = pafy.new(url)
-    best = video.getbestaudio()
-    playurl = best.url
-    Media = Instance.media_new(playurl)
-    Media.get_mrl()
-    player.set_media(Media)
 
 f = open(url_file, "r")
 setURL(f.readline())
