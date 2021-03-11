@@ -50,7 +50,7 @@ def play():
     global start_time
     global url
     player.stop()
-    if time.time() - last_reset > 600
+    if time.time() - last_reset > 600:
        resetPlayer() 
        print("reset player")        
     player.play()
