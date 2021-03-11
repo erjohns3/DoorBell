@@ -34,14 +34,6 @@ def write_to_log(msg):
 
 #################################### audio
 
-url = "null"
-skip = 0.0
-last_reset = 0
-duration = -1
-duration_timer = threading.Timer(duration, stop)
-Instance = vlc.Instance("prefer-insecure")
-player = Instance.media_player_new()
-
 def stop():
     global player
     player.stop()
@@ -131,6 +123,14 @@ def setDuration(val):
     f.write(str(duration))
     f.close()
 
+
+url = "null"
+skip = 0.0
+last_reset = 0
+duration = -1
+duration_timer = threading.Timer(duration, stop)
+Instance = vlc.Instance("prefer-insecure")
+player = Instance.media_player_new()
 
 f = open(url_file, "r")
 setURL(f.readline())
