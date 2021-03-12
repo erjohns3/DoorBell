@@ -113,7 +113,7 @@ def setDuration(val):
     except ValueError:
         return
     if duration <= 0:
-        duration_file = -1
+        duration = -1
     print("duration valid: " + val)
     sys.stdout.flush()
     f = open(duration_file, "w")
