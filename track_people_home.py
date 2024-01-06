@@ -1,40 +1,57 @@
 import threading
 import json
 import asyncio
-import http.server
-import socket
 
 import websockets
 
 from helpers import *
 
 
-WEBSOCKET_PORT = 6101
-SOCKET_PORT = 6102
-
-
-
+WEBSOCKET_PORT = 6201
 addresses = {
-    'maria': '192.168.86.29',
-    'eric': '192.168.86.46',
+    'Maria': '192.168.86.29',
+    'Eric': '192.168.86.46',
+    'Andrew': '192.168.86.45',
+
+    # 'Android': '192.168.86.', # 0a:c9:06
+    # 'eric': '192.168.86.46',    # 
+    # 'eric': '192.168.86.46',
+    # 'eric': '192.168.86.46',
 }
 
 state = {person:True for person in addresses}
 def is_alive(ip_addr):
-    return subprocess.call(['fping', '-t10000', '-c1', ip_addr]) == 0 # t is milliseconds
+    retcode, stdout, stderr = run_command_blocking([
+        'fping',
+        f'-t10000',
+        f'-c1',
+        f'{ip_addr}',
+    ]) # t is milliseconds, c is number of retries
+    return retcode == 0
 
 
+send_update = False
 def track_whos_home():
+    global send_update
     while True:
         for person, ip_addr in addresses.items():
-            state[person] = is_alive(ip_addr)
+            new = is_alive(ip_addr)
+            if new != state[person]:
+                send_update = True
+            state[person] = new
+            if state[person]:
+                print_green(f'{person} is home')
+            else:
+                print_red(f'{person} is NOT home')
         time.sleep(1)
 
 
 async def broadcast(msg):
     for socket in sockets:
         try:
+            print_green(f'Sending to socket: {socket}')
             await socket.send(msg)
+            print_green(f'sent to socket: {socket}')
             return True
         except:
             print(f'socket send failed. socket: {socket}', flush=True)
@@ -42,9 +59,15 @@ async def broadcast(msg):
 
 sockets = []
 async def init_client(websocket, path):
+    try:
+        print(f'sending first message to client: {websocket}')
+        await websocket.send(json.dumps(state))
+        print(f'sent first message to client: {websocket}')
+    except:
+        print('client send failed')
+        return
+
     sockets.append(websocket)
-    if not broadcast(json.dumps(state)):
-        return sockets.remove(websocket)
 
     while True:
         try:
@@ -64,21 +87,19 @@ async def init_client(websocket, path):
         print('message recieved: ', msg)
         await broadcast(json.dumps(state))
 
-if is_andrewpi():
-    local_ip = '192.168.86.84'
-else:
-    local_ip = 'UNKNOWN_IP'
-try:
-    info = socket.gethostbyname_ex(socket.gethostname())
-    if '127.0.1' not in info[2][0]:
-        local_ip = info[2][0]
-    else:
-        print_yellow('warning, failed to gethostbyname_ex accurately, ip could be wrong')
-except:
-    pass
+
+async def send_updates_infinite():
+    global send_update
+    while True:
+        if send_update:
+            await broadcast(json.dumps(state))
+            send_update = False
+        await asyncio.sleep(1)
+
 
 async def start_async():
     server = await websockets.serve(init_client, '0.0.0.0', WEBSOCKET_PORT)
+    asyncio.create_task(send_updates_infinite())
     await server.serve_forever()
 
 threading.Thread(target=track_whos_home).start()
