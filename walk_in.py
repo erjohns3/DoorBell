@@ -8,7 +8,6 @@ from helpers import *
 
 def ping(host):
     print(f'pinging {host}')
-    # t is milliseconds
     return subprocess.call(['fping', '-t10000', '-c1', host]) == 0
 
 
