@@ -20,11 +20,12 @@ addresses = {
 
 
 walk_ins = {
-    'maria': 'youtube',
+    'maria': 'songs/saraha.wav',
     'eric': 'songs/make_it_forever.wav',
 }
 
 last = {person:True for person in addresses}
+
 
 while True:
     for person, ip_addr in addresses.items():
@@ -32,9 +33,10 @@ while True:
         if result:
             print_green(f'pinged {person} and success')
             if not last[person]:
-                print('playing')
-                song = AudioSegment.from_wav("sound.wav")
-                play(song)
+                if person in walk_ins:
+                    print('playing')
+                    song = AudioSegment.from_wav(walk_ins[person])
+                    play(song)
         else:
             print_red(f'pinged {person} and failure')
         last[person] = result
