@@ -21,7 +21,7 @@ state = {person:True for person in addresses}
 def is_alive(ip_addr):
     retcode, stdout, stderr = run_command_blocking([
         'fping',
-        f'-t40000',
+        f'-t60000',
         f'-c1',
         f'{ip_addr}',
     ]) # t is milliseconds, c is number of retries
