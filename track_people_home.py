@@ -14,6 +14,7 @@ addresses = {
     'Andrew': '192.168.86.45', # i think "android-2"
     'Matt': '192.168.86.87', # i think "Android"
     'Randy': '192.168.86.37', # i think "Pixel-5a"
+    'Mary': '192.168.86.49', # i think "Android-2"
 }
 
 state = {person:True for person in addresses}
