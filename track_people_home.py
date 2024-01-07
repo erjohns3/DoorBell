@@ -9,14 +9,11 @@ from helpers import *
 
 WEBSOCKET_PORT = 6201
 addresses = {
-    'Maria': '192.168.86.29',
-    'Eric': '192.168.86.46',
-    'Andrew': '192.168.86.45',
-
-    # 'Android': '192.168.86.', # 0a:c9:06
-    # 'eric': '192.168.86.46',    # 
-    # 'eric': '192.168.86.46',
-    # 'eric': '192.168.86.46',
+    'Maria': '192.168.86.29', # something like "maria-pixel"
+    'Eric': '192.168.86.46', # something like "eric-pixel"
+    'Andrew': '192.168.86.45', # i think "android-2"
+    'Matt': '192.168.86.87', # i think "Android"
+    'Randy': '192.168.86.37', # i think "Pixel-5a"
 }
 
 state = {person:True for person in addresses}
