@@ -20,7 +20,7 @@ state = {person:True for person in addresses}
 def is_alive(ip_addr):
     retcode, stdout, stderr = run_command_blocking([
         'fping',
-        f'-t10000',
+        f'-t40000',
         f'-c1',
         f'{ip_addr}',
     ]) # t is milliseconds, c is number of retries
@@ -28,20 +28,18 @@ def is_alive(ip_addr):
 
 
 send_update = False
-def track_whos_home():
+def track_person(person, ip_addr):
     global send_update
     while True:
-        for person, ip_addr in addresses.items():
-            new = is_alive(ip_addr)
-            if new != state[person]:
-                send_update = True
-            state[person] = new
-            if state[person]:
-                print_green(f'{person} is home')
-            else:
-                print_red(f'{person} is NOT home')
-        time.sleep(1)
-
+        new = is_alive(ip_addr)
+        if new != state[person]:
+            send_update = True
+        state[person] = new
+        if state[person]:
+            print_green(f'{person} is home')
+        else:
+            print_red(f'{person} is NOT home')
+        time.sleep(7)
 
 async def broadcast(msg):
     for socket in sockets:
@@ -57,15 +55,13 @@ async def broadcast(msg):
 sockets = []
 async def init_client(websocket, path):
     try:
-        print(f'sending first message to client: {websocket}')
+        print(f'Trying to send first message to client: {websocket}')
         await websocket.send(json.dumps(state))
         print(f'sent first message to client: {websocket}')
     except:
-        print('client send failed')
-        return
+        return print_red('client send failed')
 
     sockets.append(websocket)
-
     while True:
         try:
             msg_string = await websocket.recv()
@@ -99,6 +95,9 @@ async def start_async():
     asyncio.create_task(send_updates_infinite())
     await server.serve_forever()
 
-threading.Thread(target=track_whos_home).start()
+threads = []
+for person, ip_addr in addresses.items():
+    threads.append(threading.Thread(target=track_person, args=(person, ip_addr)))
+    threads[-1].start()
 
 asyncio.run(start_async())
