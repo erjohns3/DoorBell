@@ -9,7 +9,7 @@ from helpers import *
 
 WEBSOCKET_PORT = 6201
 addresses = {
-    'Maria': '192.168.86.29', # something like "maria-pixel"
+    'Maria': '192.168.86.95', # "Maria-Pixel"
     'Eric': '192.168.86.46', # something like "eric-pixel"
     'Andrew': '192.168.86.45', # i think "android-2"
     'Matt': '192.168.86.87', # i think "Android"
