@@ -19,13 +19,16 @@ addresses = {
 
 state = {person:True for person in addresses}
 def is_alive(ip_addr):
-    retcode, stdout, stderr = run_command_blocking([
-        'fping',
-        f'-t60000',
-        f'-c1',
-        f'{ip_addr}',
-    ]) # t is milliseconds, c is number of retries
-    return retcode == 0
+    for _ in range(3):
+        retcode, stdout, stderr = run_command_blocking([
+            'fping',
+            f'-t20000',
+            f'-c1',
+            f'{ip_addr}',
+        ]) # t is milliseconds, c is number of retries
+        if retcode == 0:
+            return True
+    return False
 
 
 send_update = False
@@ -40,7 +43,7 @@ def track_person(person, ip_addr):
             print_green(f'{person} is home')
         else:
             print_red(f'{person} is NOT home')
-        time.sleep(7)
+        time.sleep(15)
 
 async def broadcast(msg):
     for socket in sockets:
