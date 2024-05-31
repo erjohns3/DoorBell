@@ -90,6 +90,7 @@ async def init_client(websocket, path):
         if 'stake_balance' in msg and 'person' in msg:
             person = msg['person']
             stake_balance = msg['stake_balance']
+            print(f'Updating stake balance for {person} to {stake_balance}')
             state[person]['stake_balance'] = stake_balance
 
         await broadcast(json.dumps(state))
