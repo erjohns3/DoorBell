@@ -15,9 +15,10 @@ addresses = {
     'Matt': '192.168.86.87', # i think "Android"
     'Randy': '192.168.86.37', # i think "Pixel-5a"
     'Mary': '192.168.86.49', # i think "Android-2"
+    'Chris': None,
 }
 
-state = {person:True for person in addresses}
+state = {person:{'home': True, 'stake_balance': None} for person in addresses}
 def is_alive(ip_addr):
     for _ in range(3):
         retcode, stdout, stderr = run_command_blocking([
@@ -35,15 +36,17 @@ send_update = False
 def track_person(person, ip_addr):
     global send_update
     while True:
-        new = is_alive(ip_addr)
-        if new != state[person]:
-            send_update = True
-        state[person] = new
-        if state[person]:
-            print_green(f'{person} is home')
-        else:
-            print_red(f'{person} is NOT home')
-        time.sleep(15)
+        if ip_addr is not None:
+            new_reading = is_alive(ip_addr)
+            if new_reading != state[person]['home']:
+                send_update = True
+            state[person]['home'] = new_reading
+            if state[person]['home']:
+                print_green(f'{person} is home')
+            else:
+                print_red(f'{person} is NOT home')
+            time.sleep(15)
+
 
 async def broadcast(msg):
     for socket in sockets:
@@ -58,6 +61,7 @@ async def broadcast(msg):
 
 sockets = []
 async def init_client(websocket, path):
+    global state
     try:
         print(f'Trying to send first message to client: {websocket}')
         await websocket.send(json.dumps(state))
@@ -82,6 +86,12 @@ async def init_client(websocket, path):
             continue
 
         print('message recieved: ', msg)
+
+        if 'stake_balance' in msg and 'person' in msg:
+            person = msg['person']
+            stake_balance = msg['stake_balance']
+            state[person]['stake_balance'] = stake_balance
+
         await broadcast(json.dumps(state))
 
 
