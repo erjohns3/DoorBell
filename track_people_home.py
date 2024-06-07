@@ -19,6 +19,10 @@ addresses = {
 }
 
 state = {person:{'home': True, 'stake_balance': None} for person in addresses}
+for person in state:
+    if addresses[person] is None:
+        del state[person]['home']
+
 def is_alive(ip_addr):
     for _ in range(3):
         retcode, stdout, stderr = run_command_blocking([
@@ -36,16 +40,15 @@ send_update = False
 def track_person(person, ip_addr):
     global send_update
     while True:
-        if ip_addr is not None:
-            new_reading = is_alive(ip_addr)
-            if new_reading != state[person]['home']:
-                send_update = True
-            state[person]['home'] = new_reading
-            if state[person]['home']:
-                print_green(f'{person} is home')
-            else:
-                print_red(f'{person} is NOT home')
-            time.sleep(15)
+        new_reading = is_alive(ip_addr)
+        if new_reading != state[person]['home']:
+            send_update = True
+        state[person]['home'] = new_reading
+        if state[person]['home']:
+            print_green(f'{person} is home')
+        else:
+            print_red(f'{person} is NOT home')
+        time.sleep(15)
 
 
 async def broadcast(msg):
@@ -113,7 +116,10 @@ async def start_async():
 
 threads = []
 for person, ip_addr in addresses.items():
-    threads.append(threading.Thread(target=track_person, args=(person, ip_addr)))
-    threads[-1].start()
+    if ip_addr is None:
+        print_red(f'Skipping {person} because ip address is None')
+    else:
+        threads.append(threading.Thread(target=track_person, args=(person, ip_addr)))
+        threads[-1].start()
 
 asyncio.run(start_async())
